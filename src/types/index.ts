@@ -26,6 +26,7 @@ export type PresetId =
   | 'carousel'
   | 'foldingStack'
   | 'parallaxFloat'
+  | 'parallaxStack'
   | 'simpleStack'
   | 'maskReveal'
 
@@ -34,6 +35,7 @@ export const PRESET_ORDER: PresetId[] = [
   'carousel',
   'foldingStack',
   'parallaxFloat',
+  'parallaxStack',
   'maskReveal',
 ]
 
@@ -42,6 +44,7 @@ export const PRESET_LABELS: Record<PresetId, string> = {
   carousel: 'Carousel',
   foldingStack: 'Folding Stack',
   parallaxFloat: 'Parallax Float',
+  parallaxStack: 'Parallax Stack',
   maskReveal: 'Mask Reveal',
 }
 
@@ -69,6 +72,10 @@ export interface ParallaxFloatParams {
   gap: number
 }
 
+export interface ParallaxStackParams {
+  gap: number
+}
+
 export type SimpleStackParams = Record<string, never>
 
 export interface MaskRevealParams {
@@ -80,6 +87,7 @@ export interface PresetParamsMap {
   carousel: CarouselParams
   foldingStack: FoldingStackParams
   parallaxFloat: ParallaxFloatParams
+  parallaxStack: ParallaxStackParams
   simpleStack: SimpleStackParams
   maskReveal: MaskRevealParams
 }
@@ -88,6 +96,7 @@ export const DEFAULT_PRESET_PARAMS: PresetParamsMap = {
   carousel: { mode: 'snappy', gap: 40, holdMs: 900 },
   foldingStack: { axis: 'horizontal', perspective: 900 },
   parallaxFloat: { imagesPerLayer: 3, gap: 40 },
+  parallaxStack: { gap: 40 },
   simpleStack: {},
   maskReveal: { shape: 'rectangle', direction: 'left' },
 }

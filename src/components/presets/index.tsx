@@ -3,6 +3,7 @@ import { SimpleStack } from './SimpleStack'
 import { Carousel } from './Carousel'
 import { FoldingStack } from './FoldingStack'
 import { ParallaxFloat } from './ParallaxFloat'
+import { ParallaxStack } from './ParallaxStack'
 import { MaskReveal } from './MaskReveal'
 
 type PresetComponent = {
@@ -14,5 +15,6 @@ export const PRESET_COMPONENTS: PresetComponent = {
   carousel: Carousel,
   foldingStack: FoldingStack,
   parallaxFloat: ParallaxFloat,
+  parallaxStack: ParallaxStack,
   maskReveal: MaskReveal,
 }

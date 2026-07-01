@@ -51,6 +51,7 @@ const emptySlots: Record<PresetId, Slot[]> = {
   carousel: [],
   foldingStack: [],
   parallaxFloat: [],
+  parallaxStack: [],
   maskReveal: [],
 }
 

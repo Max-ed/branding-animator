@@ -35,6 +35,10 @@ export function getLoopDurationMs(
       base = getContinuousDurationMs(frontCount) * Math.pow(2, Math.max(numLayers - 1, 0))
       break
     }
+    case 'parallaxStack': {
+      base = getContinuousDurationMs(count)
+      break
+    }
     case 'maskReveal': {
       base = count * TIMING.maskReveal.staggerMs + TIMING.maskReveal.durationMs + 150
       break

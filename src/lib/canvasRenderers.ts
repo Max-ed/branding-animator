@@ -5,6 +5,7 @@ import type {
   FoldingStackParams,
   MaskRevealParams,
   ParallaxFloatParams,
+  ParallaxStackParams,
   PresetId,
   PresetParamsMap,
   SharedAnimationSettings,
@@ -227,11 +228,44 @@ function drawMaskReveal(f: FrameCtx, params: MaskRevealParams) {
   })
 }
 
+const PARALLAX_STACK_SCALE_PER_LAYER = 0.85
+
+function drawParallaxStack(f: FrameCtx, params: ParallaxStackParams) {
+  const baseSize = Math.min(f.width, f.height) * BASE_SIZE_FRACTION.parallaxStack
+  const cy = f.height / 2
+
+  const filledSlots = f.slots.filter(s => s.assetId && f.assets[s.assetId])
+  if (filledSlots.length === 0) return
+
+  const N = filledSlots.length
+  const T = getContinuousDurationMs(N)
+  const loopMs = speedScale(T, f.shared.speed)
+
+  // Draw back to front (painter's algorithm)
+  for (let L = N - 1; L >= 0; L--) {
+    const slot = filledSlots[L]
+    const asset = slot.assetId ? f.assets[slot.assetId] : undefined
+    if (!asset) continue
+    const layerBaseSize = baseSize * Math.pow(PARALLAX_STACK_SCALE_PER_LAYER, L)
+    const step = layerBaseSize + params.gap
+    const progress = loopMs > 0 ? (f.elapsedMs % loopMs) / loopMs : 0
+    const offsetX = -progress * step
+    const copies = Math.ceil(f.width / step) + 2
+
+    for (let copy = 0; copy < copies; copy++) {
+      const x = copy * step + offsetX + layerBaseSize / 2
+      if (x + layerBaseSize / 2 < 0 || x - layerBaseSize / 2 > f.width) continue
+      drawContain(f.ctx, getMediaElement(asset), x, cy, layerBaseSize * (slot.scale ?? 1), 1, undefined, f.dropShadow, f.cornerRadius)
+    }
+  }
+}
+
 const RENDERERS: { [K in PresetId]: (f: FrameCtx, params: PresetParamsMap[K]) => void } = {
   simpleStack: drawSimpleStack,
   carousel: drawCarousel,
   foldingStack: drawFoldingStack,
   parallaxFloat: drawParallaxFloat,
+  parallaxStack: drawParallaxStack,
   maskReveal: drawMaskReveal,
 }
 

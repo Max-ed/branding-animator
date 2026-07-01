@@ -7,5 +7,6 @@ export const BASE_SIZE_FRACTION: Record<PresetId, number> = {
   carousel: 0.69,
   foldingStack: 0.53,
   parallaxFloat: 0.41,
+  parallaxStack: 0.50,
   maskReveal: 0.53,
 }

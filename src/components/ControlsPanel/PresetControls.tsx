@@ -1,5 +1,5 @@
 import { useApp } from '../../state/AppContext'
-import type { CarouselParams, FoldingStackParams, MaskRevealParams, ParallaxFloatParams } from '../../types'
+import type { CarouselParams, FoldingStackParams, MaskRevealParams, ParallaxFloatParams, ParallaxStackParams } from '../../types'
 
 export function PresetControls() {
   const { state, dispatch } = useApp()
@@ -104,6 +104,25 @@ export function PresetControls() {
             step={5}
             value={p.gap}
             onChange={(e) => set<ParallaxFloatParams>({ gap: Number(e.target.value) })}
+          />
+        </div>
+      </div>
+    )
+  }
+
+  if (preset === 'parallaxStack') {
+    const p = state.presetParams.parallaxStack
+    return (
+      <div className="control-group">
+        <div className="control-field">
+          <label>Gap — {p.gap}px</label>
+          <input
+            type="range"
+            min={0}
+            max={200}
+            step={5}
+            value={p.gap}
+            onChange={(e) => set<ParallaxStackParams>({ gap: Number(e.target.value) })}
           />
         </div>
       </div>
