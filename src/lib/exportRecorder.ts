@@ -42,6 +42,20 @@ export async function recordExport(opts: RecordExportOptions): Promise<void> {
   if (!ctx) throw new Error('Canvas 2D context unavailable')
 
   const loopMs = getLoopDurationMs(opts.preset, opts.params, opts.shared, opts.slots.length)
+
+  // Pre-decode: render sample frames across the full animation timeline
+  // before the MediaRecorder starts. This forces the browser to flush image
+  // decode pipelines so no asset appears black in the first recorded frames.
+  const WARMUP_SAMPLES = 12
+  for (let i = 0; i < WARMUP_SAMPLES; i++) {
+    drawPresetFrame(
+      ctx, opts.preset, opts.params, opts.slots, opts.assets, opts.shared,
+      opts.backgroundColor, opts.dropShadow, opts.cornerRadius,
+      opts.width, opts.height, (loopMs / WARMUP_SAMPLES) * i,
+    )
+  }
+  await new Promise<void>((r) => setTimeout(r, 80))
+
   const stream = canvas.captureStream(30)
   const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm'
   const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 12_000_000 })

@@ -6,7 +6,6 @@ import { getContinuousDurationMs } from '../../lib/carouselTiming'
 import { AssetVisual } from './AssetVisual'
 
 const SCALE_PER_LAYER = 0.82
-const SPEED_PER_LAYER = 0.60
 
 export function ParallaxFloat({ slots, assets, params, shared, playKey, width, height }: PresetRenderProps<ParallaxFloatParams>) {
   const baseSize = Math.min(width, height) * BASE_SIZE_FRACTION.parallaxFloat
@@ -21,17 +20,20 @@ export function ParallaxFloat({ slots, assets, params, shared, playKey, width, h
   if (layerSlots.length === 0) return <div key={playKey} className="preset-stage" />
 
   const numLayers = layerSlots.length
+  // Front layer (L=0) sets the base loop time. Each deeper layer takes 2×
+  // longer, so loop durations are harmonically related (1T, 2T, 4T…) and
+  // all layers return to position 0 simultaneously after 2^(numLayers-1) × T.
+  const baseLoopMs = getContinuousDurationMs(Math.max(layerSlots[0].length, 1))
 
   return (
     <div key={playKey} className="preset-stage">
       {layerSlots.map((layerItems, L) => {
         const scaleMultiplier = Math.pow(SCALE_PER_LAYER, L)
-        const speedMultiplier = Math.pow(SPEED_PER_LAYER, L)
         const layerBaseSize = baseSize * scaleMultiplier
         const step = layerBaseSize + params.gap
         const count = Math.max(layerItems.length, 1)
         const totalWidth = count * step
-        const durationSec = speedScale(getContinuousDurationMs(count), shared.speed) / speedMultiplier / 1000
+        const durationSec = speedScale(baseLoopMs * Math.pow(2, L), shared.speed) / 1000
         const copies = Math.ceil(width / totalWidth) + 2
         const zIndex = numLayers - L
 

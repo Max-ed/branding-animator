@@ -27,8 +27,12 @@ export function getLoopDurationMs(
     }
     case 'parallaxFloat': {
       const p = params as PresetParamsMap['parallaxFloat']
-      const frontCount = Math.min(Math.max(p.imagesPerLayer, 1), count)
-      base = getContinuousDurationMs(frontCount)
+      const n = Math.max(p.imagesPerLayer, 1)
+      const numLayers = Math.ceil(count / n)
+      const frontCount = Math.min(n, count)
+      // Master sync period: front layer loops 2^(numLayers-1) times while
+      // the back layer completes exactly once — so all layers land at 0 together.
+      base = getContinuousDurationMs(frontCount) * Math.pow(2, Math.max(numLayers - 1, 0))
       break
     }
     case 'maskReveal': {

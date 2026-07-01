@@ -157,7 +157,6 @@ function drawFoldingStack(f: FrameCtx, params: FoldingStackParams) {
 }
 
 const PARALLAX_SCALE_PER_LAYER = 0.82
-const PARALLAX_SPEED_PER_LAYER = 0.60
 
 function drawParallaxFloat(f: FrameCtx, params: ParallaxFloatParams) {
   const baseSize = Math.min(f.width, f.height) * BASE_SIZE_FRACTION.parallaxFloat
@@ -172,17 +171,17 @@ function drawParallaxFloat(f: FrameCtx, params: ParallaxFloatParams) {
   if (layerSlots.length === 0) return
 
   const numLayers = layerSlots.length
+  const baseLoopMs = getContinuousDurationMs(Math.max(layerSlots[0].length, 1))
 
   // Draw back to front (painter's algorithm — highest L index = back)
   for (let L = numLayers - 1; L >= 0; L--) {
     const layerItems = layerSlots[L]
     const count = Math.max(layerItems.length, 1)
     const scaleMultiplier = Math.pow(PARALLAX_SCALE_PER_LAYER, L)
-    const speedMultiplier = Math.pow(PARALLAX_SPEED_PER_LAYER, L)
     const layerBaseSize = baseSize * scaleMultiplier
     const step = layerBaseSize + params.gap
     const totalWidth = count * step
-    const loopMs = speedScale(getContinuousDurationMs(count), f.shared.speed) / speedMultiplier
+    const loopMs = speedScale(baseLoopMs * Math.pow(2, L), f.shared.speed)
     const progress = loopMs > 0 ? (f.elapsedMs % loopMs) / loopMs : 0
     const offsetX = -progress * totalWidth
     const copies = Math.ceil(f.width / totalWidth) + 2
