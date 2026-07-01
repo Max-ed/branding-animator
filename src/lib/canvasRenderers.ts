@@ -156,35 +156,47 @@ function drawFoldingStack(f: FrameCtx, params: FoldingStackParams) {
   })
 }
 
+const PARALLAX_SCALE_PER_LAYER = 0.82
+const PARALLAX_SPEED_PER_LAYER = 0.60
+
 function drawParallaxFloat(f: FrameCtx, params: ParallaxFloatParams) {
   const baseSize = Math.min(f.width, f.height) * BASE_SIZE_FRACTION.parallaxFloat
-  const count = Math.max(f.slots.length, 1)
+  const n = Math.max(params.imagesPerLayer, 1)
+  const cy = f.height / 2
 
-  f.slots.forEach((slot, index) => {
-    const asset = slot.assetId ? f.assets[slot.assetId] : undefined
-    if (!asset) return
-    const depth = count > 1 ? index / (count - 1) : 0.5
-    const layerAmplitude = params.amplitude * (0.4 + 0.6 * depth)
-    const layerSpeed = params.driftSpeed * (0.7 + 0.3 * depth)
-    const x = ((index + 0.5) / count) * f.width
-    const cy = f.height / 2
+  const layerSlots: Slot[][] = []
+  for (let i = 0; i < f.slots.length; i += n) {
+    layerSlots.push(f.slots.slice(i, i + n))
+  }
+  if (layerSlots.length === 0) return
 
-    if (params.continuous) {
-      const cycleMs = speedScale(TIMING.parallaxFloat.continuousCycleBaseMs / layerSpeed, f.shared.speed)
-      const phase = (f.elapsedMs % cycleMs) / cycleMs
-      const y = Math.sin(phase * Math.PI * 2) * layerAmplitude
-      const fadeIn = Math.min(f.elapsedMs / 400, 1)
-      drawContain(f.ctx, getMediaElement(asset), x, cy + y, baseSize * slot.scale, fadeIn, undefined, f.dropShadow, f.cornerRadius)
-      return
+  const numLayers = layerSlots.length
+
+  // Draw back to front (painter's algorithm — highest L index = back)
+  for (let L = numLayers - 1; L >= 0; L--) {
+    const layerItems = layerSlots[L]
+    const count = Math.max(layerItems.length, 1)
+    const scaleMultiplier = Math.pow(PARALLAX_SCALE_PER_LAYER, L)
+    const speedMultiplier = Math.pow(PARALLAX_SPEED_PER_LAYER, L)
+    const layerBaseSize = baseSize * scaleMultiplier
+    const step = layerBaseSize + params.gap
+    const totalWidth = count * step
+    const loopMs = speedScale(getContinuousDurationMs(count), f.shared.speed) / speedMultiplier
+    const progress = loopMs > 0 ? (f.elapsedMs % loopMs) / loopMs : 0
+    const offsetX = -progress * totalWidth
+    const copies = Math.ceil(f.width / totalWidth) + 2
+
+    for (let copy = 0; copy < copies; copy++) {
+      for (let i = 0; i < layerItems.length; i++) {
+        const slot = layerItems[i]
+        const asset = slot.assetId ? f.assets[slot.assetId] : undefined
+        if (!asset) continue
+        const x = copy * totalWidth + i * step + layerBaseSize / 2 + offsetX
+        if (x + layerBaseSize / 2 < 0 || x - layerBaseSize / 2 > f.width) continue
+        drawContain(f.ctx, getMediaElement(asset), x, cy, layerBaseSize * (slot.scale ?? 1), 1, undefined, f.dropShadow, f.cornerRadius)
+      }
     }
-
-    const delaySec = speedScale(index * TIMING.parallaxFloat.triggeredStaggerMs, f.shared.speed) / 1000
-    const durationMs = speedScale(TIMING.parallaxFloat.triggeredDurationMs, f.shared.speed)
-    const p = evalProgress(f.shared.easing, f.elapsedMs, delaySec, durationMs)
-    if (p <= 0) return
-    const y = lerp(-layerAmplitude * 2, 0, p)
-    drawContain(f.ctx, getMediaElement(asset), x, cy + y, baseSize * slot.scale, Math.min(p, 1), undefined, f.dropShadow, f.cornerRadius)
-  })
+  }
 }
 
 function drawMaskReveal(f: FrameCtx, params: MaskRevealParams) {

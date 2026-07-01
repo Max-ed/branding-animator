@@ -1,62 +1,64 @@
 import { motion } from 'framer-motion'
 import type { ParallaxFloatParams, PresetRenderProps } from '../../types'
-import { getTransition, speedScale } from '../../lib/easing'
-import { TIMING } from '../../lib/presetTiming'
+import { speedScale } from '../../lib/easing'
 import { BASE_SIZE_FRACTION } from '../../lib/baseSize'
+import { getContinuousDurationMs } from '../../lib/carouselTiming'
 import { AssetVisual } from './AssetVisual'
 
-export function ParallaxFloat({
-  slots,
-  assets,
-  params,
-  shared,
-  playKey,
-  width,
-  height,
-}: PresetRenderProps<ParallaxFloatParams>) {
+const SCALE_PER_LAYER = 0.82
+const SPEED_PER_LAYER = 0.60
+
+export function ParallaxFloat({ slots, assets, params, shared, playKey, width, height }: PresetRenderProps<ParallaxFloatParams>) {
   const baseSize = Math.min(width, height) * BASE_SIZE_FRACTION.parallaxFloat
-  const count = Math.max(slots.length, 1)
+  const n = Math.max(params.imagesPerLayer, 1)
+  const cy = height / 2
+
+  const layerSlots: (typeof slots)[] = []
+  for (let i = 0; i < slots.length; i += n) {
+    layerSlots.push(slots.slice(i, i + n))
+  }
+  if (layerSlots.length === 0) layerSlots.push([])
+
+  const numLayers = layerSlots.length
 
   return (
     <div key={playKey} className="preset-stage">
-      {slots.map((slot, index) => {
-        const asset = slot.assetId ? assets[slot.assetId] : undefined
-        const depth = count > 1 ? index / (count - 1) : 0.5
-        const layerAmplitude = params.amplitude * (0.4 + 0.6 * depth)
-        const layerSpeed = params.driftSpeed * (0.7 + 0.3 * depth)
-        const x = ((index + 0.5) / count) * width
-        const y = height / 2
+      {layerSlots.map((layerItems, L) => {
+        const scaleMultiplier = Math.pow(SCALE_PER_LAYER, L)
+        const speedMultiplier = Math.pow(SPEED_PER_LAYER, L)
+        const layerBaseSize = baseSize * scaleMultiplier
+        const step = layerBaseSize + params.gap
+        const count = Math.max(layerItems.length, 1)
+        const totalWidth = count * step
+        const durationSec = speedScale(getContinuousDurationMs(count), shared.speed) / speedMultiplier / 1000
+        const copies = Math.ceil(width / totalWidth) + 2
+        const zIndex = numLayers - L
 
-        if (params.continuous) {
-          const cycleSec = speedScale(TIMING.parallaxFloat.continuousCycleBaseMs / layerSpeed, shared.speed) / 1000
-          return (
-            <div key={slot.id} className="preset-item-anchor" style={{ left: x, top: y, zIndex: index }}>
-              <motion.div
-                className="preset-item"
-                initial={{ y: -layerAmplitude, opacity: 0 }}
-                animate={{ y: [-layerAmplitude, layerAmplitude, -layerAmplitude], opacity: 1 }}
-                transition={{
-                  opacity: getTransition(shared.easing, 0.4, 0),
-                  y: { duration: cycleSec, repeat: Infinity, ease: 'easeInOut' },
-                }}
-              >
-                <AssetVisual asset={asset} size={baseSize} scale={slot.scale} />
-              </motion.div>
-            </div>
-          )
-        }
-
-        const delaySec = speedScale(index * TIMING.parallaxFloat.triggeredStaggerMs, shared.speed) / 1000
-        const durationSec = speedScale(TIMING.parallaxFloat.triggeredDurationMs, shared.speed) / 1000
         return (
-          <div key={slot.id} className="preset-item-anchor" style={{ left: x, top: y, zIndex: index }}>
+          <div
+            key={L}
+            style={{ position: 'absolute', left: 0, top: cy, width: '100%', zIndex }}
+          >
             <motion.div
-              className="preset-item"
-              initial={{ y: -layerAmplitude * 2, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={getTransition(shared.easing, durationSec, delaySec)}
+              style={{ position: 'absolute', left: 0, top: 0 }}
+              initial={{ x: 0 }}
+              animate={{ x: -totalWidth }}
+              transition={{ duration: durationSec, repeat: Infinity, repeatType: 'loop', ease: 'linear' }}
             >
-              <AssetVisual asset={asset} size={baseSize} scale={slot.scale} />
+              {Array.from({ length: copies * count }, (_, vi) => {
+                const slotI = vi % count
+                const slot = layerItems[slotI]
+                const asset = slot?.assetId ? assets[slot.assetId] : undefined
+                return (
+                  <div
+                    key={vi}
+                    className="preset-item-anchor"
+                    style={{ left: vi * step + layerBaseSize / 2, top: 0 }}
+                  >
+                    <AssetVisual asset={asset} size={layerBaseSize} scale={slot?.scale ?? 1} />
+                  </div>
+                )
+              })}
             </motion.div>
           </div>
         )

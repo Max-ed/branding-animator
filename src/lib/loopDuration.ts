@@ -1,6 +1,6 @@
 import type { PresetId, PresetParamsMap, SharedAnimationSettings } from '../types'
 import { TIMING } from './presetTiming'
-import { getCarouselLoopMs } from './carouselTiming'
+import { getContinuousDurationMs, getCarouselLoopMs } from './carouselTiming'
 
 export function getLoopDurationMs(
   preset: PresetId,
@@ -27,9 +27,8 @@ export function getLoopDurationMs(
     }
     case 'parallaxFloat': {
       const p = params as PresetParamsMap['parallaxFloat']
-      base = p.continuous
-        ? TIMING.parallaxFloat.continuousCycleBaseMs / (0.7 * Math.max(p.driftSpeed, 0.01))
-        : count * TIMING.parallaxFloat.triggeredStaggerMs + TIMING.parallaxFloat.triggeredDurationMs + 200
+      const frontCount = Math.min(Math.max(p.imagesPerLayer, 1), count)
+      base = getContinuousDurationMs(frontCount)
       break
     }
     case 'maskReveal': {

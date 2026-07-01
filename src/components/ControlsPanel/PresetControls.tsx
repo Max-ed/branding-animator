@@ -85,32 +85,25 @@ export function PresetControls() {
     return (
       <div className="control-group">
         <div className="control-field">
-          <label>Drift Speed — {p.driftSpeed.toFixed(1)}×</label>
+          <label>Images per Layer — {p.imagesPerLayer}</label>
           <input
             type="range"
-            min={0.2}
-            max={3}
-            step={0.1}
-            value={p.driftSpeed}
-            onChange={(e) => set<ParallaxFloatParams>({ driftSpeed: Number(e.target.value) })}
+            min={1}
+            max={10}
+            step={1}
+            value={p.imagesPerLayer}
+            onChange={(e) => set<ParallaxFloatParams>({ imagesPerLayer: Number(e.target.value) })}
           />
         </div>
         <div className="control-field">
-          <label>Amplitude — {p.amplitude}px</label>
+          <label>Gap — {p.gap}px</label>
           <input
             type="range"
-            min={5}
-            max={150}
-            value={p.amplitude}
-            onChange={(e) => set<ParallaxFloatParams>({ amplitude: Number(e.target.value) })}
-          />
-        </div>
-        <div className="control-field control-field-row">
-          <label>Continuous</label>
-          <input
-            type="checkbox"
-            checked={p.continuous}
-            onChange={(e) => set<ParallaxFloatParams>({ continuous: e.target.checked })}
+            min={0}
+            max={200}
+            step={5}
+            value={p.gap}
+            onChange={(e) => set<ParallaxFloatParams>({ gap: Number(e.target.value) })}
           />
         </div>
       </div>

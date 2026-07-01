@@ -1,10 +1,8 @@
 import { useApp } from '../../state/AppContext'
-import { PRESET_ORDER } from '../../types'
-import { PresetTile } from './PresetTile'
+import { PRESET_ORDER, PRESET_LABELS, type PresetId } from '../../types'
 import { SharedControls } from './SharedControls'
 import { PresetControls } from './PresetControls'
 import { CanvasSettingsControls } from './CanvasSettingsControls'
-import './PresetTile.css'
 import './ControlsPanel.css'
 
 export function ControlsPanel() {
@@ -14,16 +12,14 @@ export function ControlsPanel() {
     <aside className="controls-panel">
       <section className="panel-section">
         <label>Preset</label>
-        <div className="preset-tile-list">
+        <select
+          value={state.preset}
+          onChange={(e) => dispatch({ type: 'SET_PRESET', preset: e.target.value as PresetId })}
+        >
           {PRESET_ORDER.map((preset) => (
-            <PresetTile
-              key={preset}
-              preset={preset}
-              active={state.preset === preset}
-              onSelect={() => dispatch({ type: 'SET_PRESET', preset })}
-            />
+            <option key={preset} value={preset}>{PRESET_LABELS[preset]}</option>
           ))}
-        </div>
+        </select>
       </section>
 
       <section className="panel-section">

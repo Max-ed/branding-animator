@@ -65,9 +65,8 @@ export interface FoldingStackParams {
 }
 
 export interface ParallaxFloatParams {
-  driftSpeed: number
-  amplitude: number
-  continuous: boolean
+  imagesPerLayer: number
+  gap: number
 }
 
 export type SimpleStackParams = Record<string, never>
@@ -88,7 +87,7 @@ export interface PresetParamsMap {
 export const DEFAULT_PRESET_PARAMS: PresetParamsMap = {
   carousel: { mode: 'snappy', gap: 40, holdMs: 900 },
   foldingStack: { axis: 'horizontal', perspective: 900 },
-  parallaxFloat: { driftSpeed: 1, amplitude: 40, continuous: true },
+  parallaxFloat: { imagesPerLayer: 3, gap: 40 },
   simpleStack: {},
   maskReveal: { shape: 'rectangle', direction: 'left' },
 }
