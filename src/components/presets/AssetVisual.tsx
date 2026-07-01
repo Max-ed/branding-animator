@@ -1,4 +1,4 @@
-import { useEffect, useState, type SyntheticEvent } from 'react'
+import { useCallback, useEffect, useState, type SyntheticEvent } from 'react'
 import type { Asset } from '../../types'
 import { useApp } from '../../state/AppContext'
 import { dropShadowFilter } from '../../lib/dropShadow'
@@ -20,9 +20,12 @@ function useNaturalSize(assetId: string | undefined) {
     setNatural(null)
   }, [assetId])
 
-  function fromImage(img: HTMLImageElement | null) {
+  // useCallback keeps the same function reference across re-renders so React
+  // doesn't treat it as a changed ref on every render — which would call the
+  // callback again with the element, calling setNatural, re-rendering, repeat.
+  const fromImage = useCallback((img: HTMLImageElement | null) => {
     if (img && img.complete && img.naturalWidth) setNatural({ w: img.naturalWidth, h: img.naturalHeight })
-  }
+  }, [])
 
   function onImageLoad(e: SyntheticEvent<HTMLImageElement>) {
     setNatural({ w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight })

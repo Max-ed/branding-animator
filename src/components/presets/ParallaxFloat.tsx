@@ -13,11 +13,12 @@ export function ParallaxFloat({ slots, assets, params, shared, playKey, width, h
   const n = Math.max(params.imagesPerLayer, 1)
   const cy = height / 2
 
+  const filledSlots = slots.filter(s => s.assetId && assets[s.assetId])
   const layerSlots: (typeof slots)[] = []
-  for (let i = 0; i < slots.length; i += n) {
-    layerSlots.push(slots.slice(i, i + n))
+  for (let i = 0; i < filledSlots.length; i += n) {
+    layerSlots.push(filledSlots.slice(i, i + n))
   }
-  if (layerSlots.length === 0) layerSlots.push([])
+  if (layerSlots.length === 0) return <div key={playKey} className="preset-stage" />
 
   const numLayers = layerSlots.length
 

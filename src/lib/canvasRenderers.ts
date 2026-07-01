@@ -164,9 +164,10 @@ function drawParallaxFloat(f: FrameCtx, params: ParallaxFloatParams) {
   const n = Math.max(params.imagesPerLayer, 1)
   const cy = f.height / 2
 
+  const filledSlots = f.slots.filter(s => s.assetId && f.assets[s.assetId])
   const layerSlots: Slot[][] = []
-  for (let i = 0; i < f.slots.length; i += n) {
-    layerSlots.push(f.slots.slice(i, i + n))
+  for (let i = 0; i < filledSlots.length; i += n) {
+    layerSlots.push(filledSlots.slice(i, i + n))
   }
   if (layerSlots.length === 0) return
 
