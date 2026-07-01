@@ -1,0 +1,197 @@
+.preset-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  width: 100%;
+}
+
+.preset-tile.active {
+  border-color: var(--accent);
+}
+
+.preset-tile-label {
+  font-size: 11px;
+  color: var(--text);
+  text-align: left;
+}
+
+.preset-tile-art {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 40px;
+  background: var(--bg-0);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.preset-tile-art i {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--accent);
+  display: block;
+}
+
+/* Simple Stack: staggered drop-in with offset, looping */
+.preset-tile-art-simpleStack i {
+  left: 14px;
+  top: 14px;
+  animation: tile-drop 1.8s ease-in-out infinite;
+}
+.preset-tile-art-simpleStack i:nth-child(1) {
+  left: 10px;
+  animation-delay: 0s;
+}
+.preset-tile-art-simpleStack i:nth-child(2) {
+  left: 16px;
+  animation-delay: 0.15s;
+}
+.preset-tile-art-simpleStack i:nth-child(3) {
+  left: 22px;
+  animation-delay: 0.3s;
+}
+@keyframes tile-drop {
+  0%,
+  10% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  30%,
+  85% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Carousel: slides across, one after another */
+.preset-tile-art-carousel i {
+  top: 14px;
+  left: 14px;
+  animation: tile-slide 1.8s ease-in-out infinite;
+}
+.preset-tile-art-carousel i:nth-child(2) {
+  animation-delay: 0.6s;
+}
+.preset-tile-art-carousel i:nth-child(3) {
+  animation-delay: 1.2s;
+}
+@keyframes tile-slide {
+  0% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  15%,
+  30% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  45% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Folding Stack: flip in around X axis */
+.preset-tile-art-foldingStack {
+  perspective: 200px;
+}
+.preset-tile-art-foldingStack i {
+  left: 14px;
+  top: 14px;
+  transform-origin: top center;
+  animation: tile-fold 1.8s ease-in-out infinite;
+}
+.preset-tile-art-foldingStack i:nth-child(1) {
+  left: 10px;
+  animation-delay: 0s;
+}
+.preset-tile-art-foldingStack i:nth-child(2) {
+  left: 16px;
+  animation-delay: 0.2s;
+}
+.preset-tile-art-foldingStack i:nth-child(3) {
+  left: 22px;
+  animation-delay: 0.4s;
+}
+@keyframes tile-fold {
+  0%,
+  5% {
+    opacity: 0;
+    transform: rotateX(-100deg);
+  }
+  35%,
+  85% {
+    opacity: 1;
+    transform: rotateX(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateX(0deg);
+  }
+}
+
+/* Parallax Float: continuous drift at different speeds */
+.preset-tile-art-parallaxFloat i {
+  top: 14px;
+  animation: tile-float ease-in-out infinite;
+}
+.preset-tile-art-parallaxFloat i:nth-child(1) {
+  left: 8px;
+  animation-duration: 1.4s;
+}
+.preset-tile-art-parallaxFloat i:nth-child(2) {
+  left: 18px;
+  animation-duration: 2s;
+}
+.preset-tile-art-parallaxFloat i:nth-child(3) {
+  left: 28px;
+  animation-duration: 2.6s;
+}
+@keyframes tile-float {
+  0%,
+  100% {
+    transform: translateY(-6px);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+/* Mask Reveal: rectangular wipe loop */
+.preset-tile-art-maskReveal i {
+  left: 14px;
+  top: 14px;
+  clip-path: inset(0 100% 0 0);
+  animation: tile-wipe 1.8s ease-in-out infinite;
+}
+.preset-tile-art-maskReveal i:nth-child(2) {
+  animation-delay: 0.3s;
+}
+.preset-tile-art-maskReveal i:nth-child(3) {
+  animation-delay: 0.6s;
+}
+@keyframes tile-wipe {
+  0%,
+  10% {
+    clip-path: inset(0 100% 0 0);
+  }
+  40%,
+  80% {
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    clip-path: inset(0 100% 0 0);
+  }
+}

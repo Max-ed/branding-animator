@@ -1,0 +1,45 @@
+.controls-panel {
+  background: var(--bg-1);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.controls-panel .panel-section {
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.preset-tile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.control-field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.control-field-row label {
+  margin: 0;
+}
+
+.color-swatch {
+  width: 36px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+}
