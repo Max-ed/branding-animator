@@ -41,6 +41,7 @@ type Action =
   | { type: 'SET_SPEED'; speed: number }
   | { type: 'SET_PRESET_PARAMS'; preset: PresetId; params: Partial<PresetParamsMap[PresetId]> }
   | { type: 'SET_BACKGROUND_COLOR'; color: string }
+  | { type: 'SET_BACKGROUND_ASSET'; asset: Asset | null }
   | { type: 'SET_DROP_SHADOW'; dropShadow: Partial<DropShadowSettings> }
   | { type: 'SET_CORNER_RADIUS'; cornerRadius: number }
   | { type: 'RESTART' }
@@ -162,6 +163,13 @@ function reducer(state: AppState, action: Action): AppState {
 
     case 'SET_BACKGROUND_COLOR':
       return { ...state, canvas: { ...state.canvas, backgroundColor: action.color } }
+
+    case 'SET_BACKGROUND_ASSET': {
+      if (state.canvas.backgroundAsset && action.asset?.id !== state.canvas.backgroundAsset.id) {
+        URL.revokeObjectURL(state.canvas.backgroundAsset.url)
+      }
+      return { ...state, canvas: { ...state.canvas, backgroundAsset: action.asset } }
+    }
 
     case 'SET_DROP_SHADOW':
       return { ...state, canvas: { ...state.canvas, dropShadow: { ...state.canvas.dropShadow, ...action.dropShadow } } }

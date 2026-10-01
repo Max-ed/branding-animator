@@ -53,7 +53,7 @@ export function SlotRow({ slot, asset, assets }: { slot: Slot; asset: Asset | un
         <input
           type="range"
           min={20}
-          max={200}
+          max={500}
           value={Math.round(slot.scale * 100)}
           onChange={(e) =>
             dispatch({ type: 'SET_SLOT_SCALE', slotId: slot.id, scale: Number(e.target.value) / 100 })
@@ -63,12 +63,12 @@ export function SlotRow({ slot, asset, assets }: { slot: Slot; asset: Asset | un
           type="number"
           className="slot-scale-number"
           min={20}
-          max={200}
+          max={500}
           value={Math.round(slot.scale * 100)}
           onChange={(e) => {
             const value = Number(e.target.value)
             if (Number.isNaN(value)) return
-            const clamped = Math.min(200, Math.max(20, value))
+            const clamped = Math.min(500, Math.max(20, value))
             dispatch({ type: 'SET_SLOT_SCALE', slotId: slot.id, scale: clamped / 100 })
           }}
         />

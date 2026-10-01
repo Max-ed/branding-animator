@@ -10,6 +10,7 @@ interface RecordExportOptions {
   assets: Record<string, Asset>
   shared: SharedAnimationSettings
   backgroundColor: string
+  backgroundAsset: Asset | null
   dropShadow: DropShadowSettings
   cornerRadius: number
   width: number
@@ -32,6 +33,7 @@ export async function recordExport(opts: RecordExportOptions): Promise<void> {
   const usedAssets = opts.slots
     .map((slot) => (slot.assetId ? opts.assets[slot.assetId] : undefined))
     .filter((a): a is Asset => Boolean(a))
+  if (opts.backgroundAsset) usedAssets.push(opts.backgroundAsset)
 
   await preloadAssets(usedAssets)
 
@@ -51,7 +53,7 @@ export async function recordExport(opts: RecordExportOptions): Promise<void> {
     drawPresetFrame(
       ctx, opts.preset, opts.params, opts.slots, opts.assets, opts.shared,
       opts.backgroundColor, opts.dropShadow, opts.cornerRadius,
-      opts.width, opts.height, (loopMs / WARMUP_SAMPLES) * i,
+      opts.width, opts.height, (loopMs / WARMUP_SAMPLES) * i, opts.backgroundAsset,
     )
   }
   await new Promise<void>((r) => setTimeout(r, 80))
@@ -91,6 +93,7 @@ export async function recordExport(opts: RecordExportOptions): Promise<void> {
         opts.width,
         opts.height,
         elapsed,
+        opts.backgroundAsset,
       )
       opts.onProgress?.(Math.min(elapsed / loopMs, 1))
 

@@ -269,6 +269,17 @@ const RENDERERS: { [K in PresetId]: (f: FrameCtx, params: PresetParamsMap[K]) =>
   maskReveal: drawMaskReveal,
 }
 
+function drawCoverBackground(ctx: CanvasRenderingContext2D, asset: Asset, width: number, height: number) {
+  const media = getMediaElement(asset)
+  const iw = media instanceof HTMLVideoElement ? media.videoWidth : (media as HTMLImageElement).naturalWidth
+  const ih = media instanceof HTMLVideoElement ? media.videoHeight : (media as HTMLImageElement).naturalHeight
+  if (!iw || !ih) return
+  const scale = Math.max(width / iw, height / ih)
+  const dw = iw * scale
+  const dh = ih * scale
+  ctx.drawImage(media, (width - dw) / 2, (height - dh) / 2, dw, dh)
+}
+
 export function drawPresetFrame(
   ctx: CanvasRenderingContext2D,
   preset: PresetId,
@@ -282,9 +293,11 @@ export function drawPresetFrame(
   width: number,
   height: number,
   elapsedMs: number,
+  backgroundAsset?: Asset | null,
 ) {
   ctx.fillStyle = backgroundColor
   ctx.fillRect(0, 0, width, height)
+  if (backgroundAsset) drawCoverBackground(ctx, backgroundAsset, width, height)
   const renderer = RENDERERS[preset] as (f: FrameCtx, params: PresetParamsMap[PresetId]) => void
   renderer(
     { ctx, slots, assets, shared, dropShadow: toDropShadowDraw(dropShadow), cornerRadius, width, height, elapsedMs },

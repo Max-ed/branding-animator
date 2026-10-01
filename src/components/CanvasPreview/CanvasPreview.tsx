@@ -40,6 +40,26 @@ export function CanvasPreview() {
             backgroundColor: state.canvas.backgroundColor,
           }}
         >
+          {state.canvas.backgroundAsset && (
+            state.canvas.backgroundAsset.type === 'video' ? (
+              <video
+                key={state.canvas.backgroundAsset.id}
+                src={state.canvas.backgroundAsset.url}
+                autoPlay
+                loop
+                muted
+                playsInline
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+              />
+            ) : (
+              <img
+                key={state.canvas.backgroundAsset.id}
+                src={state.canvas.backgroundAsset.url}
+                alt=""
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+              />
+            )
+          )}
           <PresetComponent
             slots={slots}
             assets={assetsById}

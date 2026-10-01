@@ -1,8 +1,21 @@
+import { useRef } from 'react'
 import { useApp } from '../../state/AppContext'
+import { makeId } from '../../lib/id'
+import type { Asset } from '../../types'
 
 export function CanvasSettingsControls() {
   const { state, dispatch } = useApp()
-  const { backgroundColor, dropShadow, cornerRadius } = state.canvas
+  const { backgroundColor, backgroundAsset, dropShadow, cornerRadius } = state.canvas
+  const bgInputRef = useRef<HTMLInputElement>(null)
+
+  function handleBgFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const type = file.type.startsWith('video/') ? 'video' : 'image'
+    const asset: Asset = { id: makeId(), type, name: file.name, url: URL.createObjectURL(file), file }
+    dispatch({ type: 'SET_BACKGROUND_ASSET', asset })
+    e.target.value = ''
+  }
 
   return (
     <div className="control-group">
@@ -15,6 +28,34 @@ export function CanvasSettingsControls() {
           onChange={(e) => dispatch({ type: 'SET_BACKGROUND_COLOR', color: e.target.value })}
         />
       </div>
+
+      <div className="control-field control-field-row">
+        <label>Background Media</label>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <button onClick={() => bgInputRef.current?.click()} style={{ fontSize: 11 }}>
+            {backgroundAsset ? 'Replace' : 'Upload'}
+          </button>
+          {backgroundAsset && (
+            <button onClick={() => dispatch({ type: 'SET_BACKGROUND_ASSET', asset: null })} style={{ fontSize: 11 }}>
+              Clear
+            </button>
+          )}
+          <input
+            ref={bgInputRef}
+            type="file"
+            accept="image/*,video/*"
+            style={{ display: 'none' }}
+            onChange={handleBgFileChange}
+          />
+        </div>
+      </div>
+      {backgroundAsset && (
+        <div className="control-field">
+          <span style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
+            {backgroundAsset.name}
+          </span>
+        </div>
+      )}
 
       <div className="control-field">
         <label>Corner Radius — {cornerRadius}%</label>

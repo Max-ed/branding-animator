@@ -53,7 +53,7 @@ export type EasingMode = 'gentle' | 'spring' | 'linear'
 export interface Slot {
   id: string
   assetId: string | null
-  scale: number // 0.2 - 2.0
+  scale: number // 0.2 - 5.0
 }
 
 export interface CarouselParams {
@@ -115,12 +115,14 @@ export interface DropShadowSettings {
 
 export interface CanvasSettings {
   backgroundColor: string
+  backgroundAsset: Asset | null
   dropShadow: DropShadowSettings
   cornerRadius: number // 0 - 50, percent of each asset's box
 }
 
 export const DEFAULT_CANVAS_SETTINGS: CanvasSettings = {
   backgroundColor: '#000000',
+  backgroundAsset: null,
   dropShadow: { enabled: true, offsetY: 12, blur: 24, opacity: 0.45 },
   cornerRadius: 0,
 }

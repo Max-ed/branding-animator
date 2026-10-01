@@ -32,6 +32,7 @@ export function ExportProvider({ children }: { children: ReactNode }) {
         assets: assetsById,
         shared: state.shared,
         backgroundColor: state.canvas.backgroundColor,
+        backgroundAsset: state.canvas.backgroundAsset,
         dropShadow: state.canvas.dropShadow,
         cornerRadius: state.canvas.cornerRadius,
         width: format.width,
