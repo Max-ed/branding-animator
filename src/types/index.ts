@@ -113,11 +113,18 @@ export interface DropShadowSettings {
   opacity: number // 0 - 1
 }
 
+export interface OutlineSettings {
+  enabled: boolean
+  color: string
+  thickness: number // px
+}
+
 export interface CanvasSettings {
   backgroundColor: string
   backgroundAsset: Asset | null
   dropShadow: DropShadowSettings
   cornerRadius: number // 0 - 50, percent of each asset's box
+  outline: OutlineSettings
 }
 
 export const DEFAULT_CANVAS_SETTINGS: CanvasSettings = {
@@ -125,6 +132,7 @@ export const DEFAULT_CANVAS_SETTINGS: CanvasSettings = {
   backgroundAsset: null,
   dropShadow: { enabled: true, offsetY: 12, blur: 24, opacity: 0.45 },
   cornerRadius: 0,
+  outline: { enabled: false, color: '#ffffff', thickness: 8 },
 }
 
 export interface PresetRenderProps<P> {

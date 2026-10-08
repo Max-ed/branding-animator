@@ -5,7 +5,7 @@ import type { Asset } from '../../types'
 
 export function CanvasSettingsControls() {
   const { state, dispatch } = useApp()
-  const { backgroundColor, backgroundAsset, dropShadow, cornerRadius } = state.canvas
+  const { backgroundColor, backgroundAsset, dropShadow, cornerRadius, outline } = state.canvas
   const bgInputRef = useRef<HTMLInputElement>(null)
 
   function handleBgFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -67,6 +67,40 @@ export function CanvasSettingsControls() {
           onChange={(e) => dispatch({ type: 'SET_CORNER_RADIUS', cornerRadius: Number(e.target.value) })}
         />
       </div>
+
+      <div className="control-field control-field-row">
+        <label>Outline</label>
+        <input
+          type="checkbox"
+          checked={outline.enabled}
+          onChange={(e) => dispatch({ type: 'SET_OUTLINE', outline: { enabled: e.target.checked } })}
+        />
+      </div>
+
+      {outline.enabled && (
+        <>
+          <div className="control-field control-field-row">
+            <label>Outline Color</label>
+            <input
+              type="color"
+              className="color-swatch"
+              value={outline.color}
+              onChange={(e) => dispatch({ type: 'SET_OUTLINE', outline: { color: e.target.value } })}
+            />
+          </div>
+
+          <div className="control-field">
+            <label>Outline Thickness — {outline.thickness}px</label>
+            <input
+              type="range"
+              min={1}
+              max={60}
+              value={outline.thickness}
+              onChange={(e) => dispatch({ type: 'SET_OUTLINE', outline: { thickness: Number(e.target.value) } })}
+            />
+          </div>
+        </>
+      )}
 
       <div className="control-field control-field-row">
         <label>Drop Shadow</label>

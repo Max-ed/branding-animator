@@ -48,10 +48,12 @@ export function AssetVisual({ asset, size, scale }: AssetVisualProps) {
   const dh = natural ? natural.h * fit : boxSize
   const radiusPx = (state.canvas.cornerRadius / 100) * Math.min(dw, dh)
 
+  const { outline } = state.canvas
   const wrapperStyle: React.CSSProperties = { width: boxSize, height: boxSize }
   const mediaStyle: React.CSSProperties = {
     filter: dropShadowFilter(state.canvas.dropShadow),
     borderRadius: `${radiusPx}px`,
+    boxShadow: outline.enabled && outline.thickness > 0 ? `0 0 0 ${outline.thickness}px ${outline.color}` : undefined,
   }
 
   if (!asset) {

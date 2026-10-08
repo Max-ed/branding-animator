@@ -7,6 +7,7 @@ import {
   type DropShadowSettings,
   type EasingMode,
   type FormatId,
+  type OutlineSettings,
   type PresetId,
   type PresetParamsMap,
   type SharedAnimationSettings,
@@ -44,6 +45,7 @@ type Action =
   | { type: 'SET_BACKGROUND_ASSET'; asset: Asset | null }
   | { type: 'SET_DROP_SHADOW'; dropShadow: Partial<DropShadowSettings> }
   | { type: 'SET_CORNER_RADIUS'; cornerRadius: number }
+  | { type: 'SET_OUTLINE'; outline: Partial<OutlineSettings> }
   | { type: 'RESTART' }
   | { type: 'SET_PLAYING'; isPlaying: boolean }
 
@@ -176,6 +178,9 @@ function reducer(state: AppState, action: Action): AppState {
 
     case 'SET_CORNER_RADIUS':
       return { ...state, canvas: { ...state.canvas, cornerRadius: action.cornerRadius } }
+
+    case 'SET_OUTLINE':
+      return { ...state, canvas: { ...state.canvas, outline: { ...state.canvas.outline, ...action.outline } } }
 
     case 'RESTART':
       return { ...state, playKey: state.playKey + 1, isPlaying: true }

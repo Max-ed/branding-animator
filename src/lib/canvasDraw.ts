@@ -11,6 +11,11 @@ export interface DropShadowDraw {
   offsetY: number
 }
 
+export interface OutlineDraw {
+  color: string
+  thickness: number
+}
+
 function roundedRectPath(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -44,6 +49,7 @@ export function drawContain(
   squash?: { axis: 'x' | 'y'; amount: number },
   dropShadow?: DropShadowDraw,
   cornerRadiusPercent?: number,
+  outline?: OutlineDraw,
 ) {
   const [iw, ih] = intrinsicSize(media)
   if (!iw || !ih || opacity <= 0) return
@@ -82,8 +88,9 @@ export function drawContain(
     ctx.scale(sx, sy)
     ctx.fillStyle = '#000'
     ctx.beginPath()
-    if (hasRadius) roundedRectPath(ctx, 0, 0, dw, dh, rx, ry)
-    else ctx.rect(0, 0, dw, dh)
+    const grow = outline && outline.thickness > 0 ? outline.thickness : 0
+    if (hasRadius) roundedRectPath(ctx, -grow, -grow, dw + grow * 2, dh + grow * 2, rx + grow, ry + grow)
+    else ctx.rect(-grow, -grow, dw + grow * 2, dh + grow * 2)
     ctx.fill()
     ctx.restore()
   }
@@ -106,6 +113,25 @@ export function drawContain(
   }
   ctx.drawImage(media, 0, 0, dw, dh)
   ctx.restore()
+
+  // Pass 3: outline drawn fully outside the image edge (path offset by half
+  // the line width), matching the CSS box-shadow spread used in the preview.
+  if (outline && outline.thickness > 0) {
+    const t = outline.thickness
+    const outerRadius = hasRadius ? radius + t / 2 : 0
+    ctx.save()
+    ctx.globalAlpha = clampedOpacity
+    ctx.translate(left, top)
+    ctx.scale(sx, sy)
+    ctx.strokeStyle = outline.color
+    ctx.lineWidth = t
+    ctx.lineJoin = 'miter'
+    ctx.beginPath()
+    if (hasRadius) roundedRectPath(ctx, -t / 2, -t / 2, dw + t, dh + t, outerRadius, outerRadius)
+    else ctx.rect(-t / 2, -t / 2, dw + t, dh + t)
+    ctx.stroke()
+    ctx.restore()
+  }
 }
 
 export function clipRectReveal(

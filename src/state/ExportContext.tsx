@@ -35,6 +35,7 @@ export function ExportProvider({ children }: { children: ReactNode }) {
         backgroundAsset: state.canvas.backgroundAsset,
         dropShadow: state.canvas.dropShadow,
         cornerRadius: state.canvas.cornerRadius,
+        outline: state.canvas.outline,
         width: format.width,
         height: format.height,
         onProgress: setProgress,

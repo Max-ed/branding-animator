@@ -1,4 +1,4 @@
-import type { Asset, DropShadowSettings, PresetId, PresetParamsMap, SharedAnimationSettings, Slot } from '../types'
+import type { Asset, DropShadowSettings, OutlineSettings, PresetId, PresetParamsMap, SharedAnimationSettings, Slot } from '../types'
 import { getLoopDurationMs } from './loopDuration'
 import { preloadAssets } from './mediaCache'
 import { drawPresetFrame } from './canvasRenderers'
@@ -13,6 +13,7 @@ interface RecordExportOptions {
   backgroundAsset: Asset | null
   dropShadow: DropShadowSettings
   cornerRadius: number
+  outline: OutlineSettings
   width: number
   height: number
   onProgress?: (progress: number) => void
@@ -53,7 +54,7 @@ export async function recordExport(opts: RecordExportOptions): Promise<void> {
     drawPresetFrame(
       ctx, opts.preset, opts.params, opts.slots, opts.assets, opts.shared,
       opts.backgroundColor, opts.dropShadow, opts.cornerRadius,
-      opts.width, opts.height, (loopMs / WARMUP_SAMPLES) * i, opts.backgroundAsset,
+      opts.width, opts.height, (loopMs / WARMUP_SAMPLES) * i, opts.backgroundAsset, opts.outline,
     )
   }
   await new Promise<void>((r) => setTimeout(r, 80))
@@ -94,6 +95,7 @@ export async function recordExport(opts: RecordExportOptions): Promise<void> {
         opts.height,
         elapsed,
         opts.backgroundAsset,
+        opts.outline,
       )
       opts.onProgress?.(Math.min(elapsed / loopMs, 1))
 

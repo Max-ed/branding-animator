@@ -4,6 +4,7 @@ import type {
   DropShadowSettings,
   FoldingStackParams,
   MaskRevealParams,
+  OutlineSettings,
   ParallaxFloatParams,
   ParallaxStackParams,
   PresetId,
@@ -25,7 +26,7 @@ import {
 } from './carouselTiming'
 import { cubicBezier } from './cubicBezier'
 import { getMediaElement } from './mediaCache'
-import { clipCircleReveal, clipDiagonalReveal, clipRectReveal, drawContain, type DropShadowDraw } from './canvasDraw'
+import { clipCircleReveal, clipDiagonalReveal, clipRectReveal, drawContain, type DropShadowDraw, type OutlineDraw } from './canvasDraw'
 
 const SNAPPY_BEZIER = cubicBezier(0.65, 0, 0.35, 1)
 const MAGNETIC_BEZIER = cubicBezier(...MAGNETIC_EASE_POINTS)
@@ -37,6 +38,7 @@ interface FrameCtx {
   shared: SharedAnimationSettings
   dropShadow: DropShadowDraw | undefined
   cornerRadius: number
+  outline: OutlineDraw | undefined
   width: number
   height: number
   elapsedMs: number
@@ -64,7 +66,7 @@ function drawSimpleStack(f: FrameCtx, _params: SimpleStackParams) {
       index < f.slots.length - 1 ? speedScale(TIMING.simpleStack.intervalMs * (index + 1), f.shared.speed) : undefined
     if (f.elapsedMs < showAtMs || (hideAtMs !== undefined && f.elapsedMs >= hideAtMs)) return
 
-    drawContain(f.ctx, getMediaElement(asset), cx, cy, baseSize * slot.scale, 1, undefined, f.dropShadow, f.cornerRadius)
+    drawContain(f.ctx, getMediaElement(asset), cx, cy, baseSize * slot.scale, 1, undefined, f.dropShadow, f.cornerRadius, f.outline)
   })
 }
 
@@ -119,7 +121,7 @@ function drawCarousel(f: FrameCtx, params: CarouselParams) {
     const asset = slot?.assetId ? f.assets[slot.assetId] : undefined
     if (!asset) return
     const x = virtualIndex * step + baseSize / 2 + trackX
-    drawContain(f.ctx, getMediaElement(asset), x, cy, baseSize * (slot?.scale ?? 1), 1, undefined, f.dropShadow, f.cornerRadius)
+    drawContain(f.ctx, getMediaElement(asset), x, cy, baseSize * (slot?.scale ?? 1), 1, undefined, f.dropShadow, f.cornerRadius, f.outline)
   })
 }
 
@@ -153,6 +155,7 @@ function drawFoldingStack(f: FrameCtx, params: FoldingStackParams) {
       { axis: isHorizontal ? 'y' : 'x', amount: squashAmount },
       f.dropShadow,
       f.cornerRadius,
+      f.outline,
     )
   })
 }
@@ -194,7 +197,7 @@ function drawParallaxFloat(f: FrameCtx, params: ParallaxFloatParams) {
         if (!asset) continue
         const x = copy * totalWidth + i * step + layerBaseSize / 2 + offsetX
         if (x + layerBaseSize / 2 < 0 || x - layerBaseSize / 2 > f.width) continue
-        drawContain(f.ctx, getMediaElement(asset), x, cy, layerBaseSize * (slot.scale ?? 1), 1, undefined, f.dropShadow, f.cornerRadius)
+        drawContain(f.ctx, getMediaElement(asset), x, cy, layerBaseSize * (slot.scale ?? 1), 1, undefined, f.dropShadow, f.cornerRadius, f.outline)
       }
     }
   }
@@ -223,7 +226,7 @@ function drawMaskReveal(f: FrameCtx, params: MaskRevealParams) {
     else if (params.shape === 'diagonal') clipDiagonalReveal(f.ctx, x, y, boxSize, params.direction, p)
     else clipRectReveal(f.ctx, x, y, boxSize, params.direction, p)
 
-    drawContain(f.ctx, getMediaElement(asset), x, y, boxSize, 1, undefined, f.dropShadow, f.cornerRadius)
+    drawContain(f.ctx, getMediaElement(asset), x, y, boxSize, 1, undefined, f.dropShadow, f.cornerRadius, f.outline)
     f.ctx.restore()
   })
 }
@@ -255,7 +258,7 @@ function drawParallaxStack(f: FrameCtx, params: ParallaxStackParams) {
     for (let copy = 0; copy < copies; copy++) {
       const x = copy * step + offsetX + layerBaseSize / 2
       if (x + layerBaseSize / 2 < 0 || x - layerBaseSize / 2 > f.width) continue
-      drawContain(f.ctx, getMediaElement(asset), x, cy, layerBaseSize * (slot.scale ?? 1), 1, undefined, f.dropShadow, f.cornerRadius)
+      drawContain(f.ctx, getMediaElement(asset), x, cy, layerBaseSize * (slot.scale ?? 1), 1, undefined, f.dropShadow, f.cornerRadius, f.outline)
     }
   }
 }
@@ -294,13 +297,18 @@ export function drawPresetFrame(
   height: number,
   elapsedMs: number,
   backgroundAsset?: Asset | null,
+  outline?: OutlineSettings,
 ) {
   ctx.fillStyle = backgroundColor
   ctx.fillRect(0, 0, width, height)
   if (backgroundAsset) drawCoverBackground(ctx, backgroundAsset, width, height)
+  const outlineDraw = outline?.enabled ? { color: outline.color, thickness: outline.thickness } : undefined
   const renderer = RENDERERS[preset] as (f: FrameCtx, params: PresetParamsMap[PresetId]) => void
   renderer(
-    { ctx, slots, assets, shared, dropShadow: toDropShadowDraw(dropShadow), cornerRadius, width, height, elapsedMs },
+    {
+      ctx, slots, assets, shared, dropShadow: toDropShadowDraw(dropShadow), cornerRadius,
+      outline: outlineDraw, width, height, elapsedMs,
+    },
     params,
   )
 }
