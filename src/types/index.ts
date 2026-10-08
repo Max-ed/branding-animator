@@ -104,6 +104,7 @@ export const DEFAULT_PRESET_PARAMS: PresetParamsMap = {
 export interface SharedAnimationSettings {
   easing: EasingMode
   speed: number // 0.5 - 3
+  durationSec: number | null // when set, overrides speed so one loop lasts exactly this long
 }
 
 export interface DropShadowSettings {

@@ -49,3 +49,14 @@ export function getLoopDurationMs(
 
   return base / shared.speed
 }
+
+export function resolveShared(
+  preset: PresetId,
+  params: PresetParamsMap[PresetId],
+  shared: SharedAnimationSettings,
+  slotCount: number,
+): SharedAnimationSettings {
+  if (!shared.durationSec) return shared
+  const baseMs = getLoopDurationMs(preset, params, { ...shared, speed: 1 }, slotCount)
+  return { ...shared, speed: baseMs / (shared.durationSec * 1000) }
+}

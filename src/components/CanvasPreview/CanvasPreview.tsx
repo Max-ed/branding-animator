@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useApp } from '../../state/AppContext'
 import { FORMATS } from '../../types'
 import { useScaleToFit } from '../../lib/useScaleToFit'
-import { getLoopDurationMs } from '../../lib/loopDuration'
+import { getLoopDurationMs, resolveShared } from '../../lib/loopDuration'
 import { formatStyleVars } from '../../lib/dimensions'
 import { PRESET_COMPONENTS } from '../presets'
 import '../presets/presets.css'
@@ -18,7 +18,8 @@ export function CanvasPreview() {
   const slots = state.presetSlots[state.preset]
   const assetsById = Object.fromEntries(state.assets.map((a) => [a.id, a]))
   const params = state.presetParams[state.preset]
-  const loopMs = getLoopDurationMs(state.preset, params, state.shared, slots.length)
+  const shared = resolveShared(state.preset, params, state.shared, slots.length)
+  const loopMs = getLoopDurationMs(state.preset, params, shared, slots.length)
 
   useEffect(() => {
     if (!state.isPlaying) return
@@ -64,7 +65,7 @@ export function CanvasPreview() {
             slots={slots}
             assets={assetsById}
             params={params as never}
-            shared={state.shared}
+            shared={shared}
             playKey={state.playKey}
             width={format.width}
             height={format.height}

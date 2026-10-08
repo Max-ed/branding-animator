@@ -40,6 +40,7 @@ type Action =
   | { type: 'REORDER_SLOTS'; fromIndex: number; toIndex: number }
   | { type: 'SET_EASING'; easing: EasingMode }
   | { type: 'SET_SPEED'; speed: number }
+  | { type: 'SET_DURATION'; durationSec: number | null }
   | { type: 'SET_PRESET_PARAMS'; preset: PresetId; params: Partial<PresetParamsMap[PresetId]> }
   | { type: 'SET_BACKGROUND_COLOR'; color: string }
   | { type: 'SET_BACKGROUND_ASSET'; asset: Asset | null }
@@ -63,7 +64,7 @@ const initialState: AppState = {
   assets: [],
   preset: 'simpleStack',
   presetSlots: emptySlots,
-  shared: { easing: 'gentle', speed: 1 },
+  shared: { easing: 'gentle', speed: 1, durationSec: null },
   presetParams: DEFAULT_PRESET_PARAMS,
   canvas: DEFAULT_CANVAS_SETTINGS,
   playKey: 0,
@@ -153,6 +154,9 @@ function reducer(state: AppState, action: Action): AppState {
 
     case 'SET_SPEED':
       return { ...state, shared: { ...state.shared, speed: action.speed } }
+
+    case 'SET_DURATION':
+      return { ...state, shared: { ...state.shared, durationSec: action.durationSec } }
 
     case 'SET_PRESET_PARAMS':
       return {

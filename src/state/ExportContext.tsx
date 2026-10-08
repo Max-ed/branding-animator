@@ -2,6 +2,7 @@ import { createContext, useContext, useState, type ReactNode } from 'react'
 import { useApp } from './AppContext'
 import { FORMATS } from '../types'
 import { recordExport } from '../lib/exportRecorder'
+import { resolveShared } from '../lib/loopDuration'
 
 interface ExportContextValue {
   isRecording: boolean
@@ -30,7 +31,12 @@ export function ExportProvider({ children }: { children: ReactNode }) {
         params: state.presetParams[state.preset],
         slots: state.presetSlots[state.preset],
         assets: assetsById,
-        shared: state.shared,
+        shared: resolveShared(
+          state.preset,
+          state.presetParams[state.preset],
+          state.shared,
+          state.presetSlots[state.preset].length,
+        ),
         backgroundColor: state.canvas.backgroundColor,
         backgroundAsset: state.canvas.backgroundAsset,
         dropShadow: state.canvas.dropShadow,
