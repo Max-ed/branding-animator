@@ -1,4 +1,4 @@
-export type FormatId = '1920x1080' | '1080x1350'
+export type FormatId = '1920x1080' | '1080x1350' | '1080x1528'
 
 export interface FormatDef {
   id: FormatId
@@ -10,6 +10,8 @@ export interface FormatDef {
 export const FORMATS: Record<FormatId, FormatDef> = {
   '1920x1080': { id: '1920x1080', label: '1920×1080', width: 1920, height: 1080 },
   '1080x1350': { id: '1080x1350', label: '1080×1350', width: 1080, height: 1350 },
+  // DIN 1:√2 (1527.4) rounded to an even height, which video encoders require.
+  '1080x1528': { id: '1080x1528', label: 'DIN 1080×1528', width: 1080, height: 1528 },
 }
 
 export type AssetType = 'image' | 'video'
