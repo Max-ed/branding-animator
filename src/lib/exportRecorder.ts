@@ -3,7 +3,7 @@ import { getLoopDurationMs } from './loopDuration'
 import { preloadAssets } from './mediaCache'
 import { drawPresetFrame } from './canvasRenderers'
 
-interface RecordExportOptions {
+export interface RecordExportOptions {
   preset: PresetId
   params: PresetParamsMap[PresetId]
   slots: Slot[]
@@ -17,9 +17,10 @@ interface RecordExportOptions {
   width: number
   height: number
   onProgress?: (progress: number) => void
+  filename?: string
 }
 
-function downloadBlob(blob: Blob, filename: string) {
+export function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
@@ -72,7 +73,7 @@ export async function recordExport(opts: RecordExportOptions): Promise<void> {
     recorder.onerror = (event) => reject(event)
     recorder.onstop = () => {
       stream.getTracks().forEach((track) => track.stop())
-      downloadBlob(new Blob(chunks, { type: 'video/webm' }), 'branding-animation.webm')
+      downloadBlob(new Blob(chunks, { type: 'video/webm' }), opts.filename ?? 'branding-animation.webm')
       resolve()
     }
 

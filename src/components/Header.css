@@ -72,3 +72,22 @@
     opacity: 0.3;
   }
 }
+
+.format-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.header-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+.export-select {
+  width: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 6px 8px;
+}

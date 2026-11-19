@@ -4,6 +4,7 @@ import { FORMATS } from '../../types'
 import { useScaleToFit } from '../../lib/useScaleToFit'
 import { getLoopDurationMs, resolveShared } from '../../lib/loopDuration'
 import { formatStyleVars } from '../../lib/dimensions'
+import { applyAssetScale } from '../../lib/effectiveSlots'
 import { PRESET_COMPONENTS } from '../presets'
 import '../presets/presets.css'
 import './CanvasPreview.css'
@@ -15,7 +16,7 @@ export function CanvasPreview() {
   const format = FORMATS[state.format]
   const scale = useScaleToFit(viewportRef, format.width, format.height)
 
-  const slots = state.presetSlots[state.preset]
+  const slots = applyAssetScale(state.presetSlots[state.preset], state.presetAssetScale[state.preset])
   const assetsById = Object.fromEntries(state.assets.map((a) => [a.id, a]))
   const params = state.presetParams[state.preset]
   const shared = resolveShared(state.preset, params, state.shared, slots.length)

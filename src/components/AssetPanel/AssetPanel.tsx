@@ -3,11 +3,15 @@ import { useApp } from '../../state/AppContext'
 import { createAssetsFromFiles } from '../../lib/assets'
 import { AssetThumb } from './AssetThumb'
 import { SlotList } from './SlotList'
+import { NumberField } from '../NumberField'
 import './AssetPanel.css'
 
 export function AssetPanel() {
   const { state, dispatch } = useApp()
   const inputRef = useRef<HTMLInputElement>(null)
+  const assetScale = state.presetAssetScale[state.preset]
+  const hasSlots = state.presetSlots[state.preset].length > 0
+  const setAssetScale = (percent: number) => dispatch({ type: 'SET_ASSET_SCALE', scale: percent / 100 })
 
   function handleFiles(files: FileList | null) {
     if (!files || files.length === 0) return
@@ -66,6 +70,37 @@ export function AssetPanel() {
         <div className="panel-section-header">
           <label>Slots — current preset</label>
         </div>
+        {hasSlots && (
+          <div className="scale-all">
+            <div className="scale-all-header">
+              <label>Scale All</label>
+              {assetScale !== 1 && (
+                <button className="scale-all-reset" onClick={() => setAssetScale(100)}>
+                  Reset
+                </button>
+              )}
+            </div>
+            <div className="slot-scale-row">
+              <input
+                type="range"
+                min={10}
+                max={300}
+                value={Math.round(assetScale * 100)}
+                onChange={(e) => setAssetScale(Number(e.target.value))}
+              />
+              <NumberField
+                className="number-field-scale"
+                value={Math.round(assetScale * 100)}
+                min={10}
+                max={300}
+                step={5}
+                suffix="%"
+                title="Scales every asset in this preset together, on top of each slot's own scale"
+                onChange={(v) => v !== null && setAssetScale(v)}
+              />
+            </div>
+          </div>
+        )}
         <SlotList />
       </section>
     </aside>

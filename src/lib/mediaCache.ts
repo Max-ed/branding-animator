@@ -41,3 +41,15 @@ export async function preloadAssets(assets: Asset[]): Promise<void> {
     }),
   )
 }
+
+/** Drops every cached element, e.g. before a configuration is loaded. */
+export function clearMediaCache(): void {
+  for (const el of cache.values()) {
+    if (el instanceof HTMLVideoElement) {
+      el.pause()
+      el.removeAttribute('src')
+      el.load()
+    }
+  }
+  cache.clear()
+}

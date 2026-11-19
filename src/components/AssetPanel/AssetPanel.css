@@ -151,12 +151,37 @@
   min-width: 0;
 }
 
-.slot-scale-row input.slot-scale-number {
-  width: 38px;
-  flex: 0 0 38px;
+.scale-all {
+  background: var(--bg-2);
+  border: 1px solid var(--accent-dim);
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.scale-all-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.scale-all-header label {
+  margin: 0;
+  color: var(--accent);
+}
+
+.scale-all-reset {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
   font-size: 10px;
-  padding: 2px 2px;
-  text-align: right;
+  padding: 0;
+}
+
+.scale-all-reset:hover {
+  color: var(--text);
 }
 
 .slot-replace {

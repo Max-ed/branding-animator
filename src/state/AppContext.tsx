@@ -16,11 +16,13 @@ import {
 import { makeId } from '../lib/id'
 import { arrayMove } from '../lib/arrayMove'
 
-interface AppState {
+export interface AppState {
   format: FormatId
   assets: Asset[]
   preset: PresetId
   presetSlots: Record<PresetId, Slot[]>
+  // Multiplier applied on top of every slot's own scale, per preset.
+  presetAssetScale: Record<PresetId, number>
   shared: SharedAnimationSettings
   presetParams: PresetParamsMap
   canvas: CanvasSettings
@@ -38,6 +40,8 @@ type Action =
   | { type: 'REPLACE_SLOT_ASSET'; slotId: string; assetId: string }
   | { type: 'SET_SLOT_SCALE'; slotId: string; scale: number }
   | { type: 'REORDER_SLOTS'; fromIndex: number; toIndex: number }
+  | { type: 'SET_ASSET_SCALE'; scale: number }
+  | { type: 'LOAD_STATE'; state: Omit<AppState, 'playKey' | 'isPlaying'> }
   | { type: 'SET_EASING'; easing: EasingMode }
   | { type: 'SET_SPEED'; speed: number }
   | { type: 'SET_DURATION'; durationSec: number | null }
@@ -59,11 +63,21 @@ const emptySlots: Record<PresetId, Slot[]> = {
   maskReveal: [],
 }
 
-const initialState: AppState = {
+export const DEFAULT_ASSET_SCALE: Record<PresetId, number> = {
+  simpleStack: 1,
+  carousel: 1,
+  foldingStack: 1,
+  parallaxFloat: 1,
+  parallaxStack: 1,
+  maskReveal: 1,
+}
+
+export const initialState: AppState = {
   format: '1920x1080',
   assets: [],
   preset: 'simpleStack',
   presetSlots: emptySlots,
+  presetAssetScale: DEFAULT_ASSET_SCALE,
   shared: { easing: 'gentle', speed: 1, durationSec: null },
   presetParams: DEFAULT_PRESET_PARAMS,
   canvas: DEFAULT_CANVAS_SETTINGS,
@@ -148,6 +162,19 @@ function reducer(state: AppState, action: Action): AppState {
           [state.preset]: arrayMove(state.presetSlots[state.preset], action.fromIndex, action.toIndex),
         },
       }
+
+    case 'SET_ASSET_SCALE':
+      return {
+        ...state,
+        presetAssetScale: { ...state.presetAssetScale, [state.preset]: action.scale },
+      }
+
+    case 'LOAD_STATE': {
+      // Release the object URLs of everything being replaced.
+      for (const asset of state.assets) URL.revokeObjectURL(asset.url)
+      if (state.canvas.backgroundAsset) URL.revokeObjectURL(state.canvas.backgroundAsset.url)
+      return { ...action.state, playKey: state.playKey + 1, isPlaying: true }
+    }
 
     case 'SET_EASING':
       return { ...state, shared: { ...state.shared, easing: action.easing } }

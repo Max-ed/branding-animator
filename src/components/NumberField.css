@@ -1,0 +1,37 @@
+.number-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.number-field input[type='text'] {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  text-align: right;
+  padding: 6px 8px;
+}
+
+.number-field:has(.number-field-suffix) input[type='text'] {
+  padding-right: 22px;
+}
+
+.number-field input[type='text']:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.number-field-suffix {
+  position: absolute;
+  right: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+
+/* Compact variant used next to sliders. */
+.number-field-scale {
+  flex: 0 0 76px;
+  width: 76px;
+}
