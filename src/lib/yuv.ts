@@ -21,9 +21,13 @@ const CR_R = (224 / 255) * 0.5
 const CR_G = (224 / 255) * (-KG / (2 * (1 - KR)))
 const CR_B = (224 / 255) * (-KB / (2 * (1 - KR)))
 
+// Transfer is tagged sRGB, not BT.709: the canvas pixels are sRGB-encoded, and
+// browsers on macOS render BT.709-tagged video with a different curve that
+// visibly washes colours out. Side-by-side tests (Chrome + Safari) confirmed
+// sRGB matches the source; BT.709, gamma 2.2 and untagged did not.
 export const BT709_LIMITED: VideoColorSpaceInit = {
   primaries: 'bt709',
-  transfer: 'bt709',
+  transfer: 'iec61966-2-1',
   matrix: 'bt709',
   fullRange: false,
 }
